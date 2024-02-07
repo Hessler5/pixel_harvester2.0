@@ -36,7 +36,7 @@ function Scraper(){
         "url": url
       }
       //posts a new scrape to the server
-      fetch(`http://localhost:5555/scraper`, {
+      fetch(`/api/scraper`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'

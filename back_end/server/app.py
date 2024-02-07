@@ -17,8 +17,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# config = dotenv_values(".env")
-# app.secret_key = config['FLASK_SECRET_KEY']
+config = dotenv_values(".env")
+app.secret_key = config['FLASK_SECRET_KEY']
 # # NEED SECRET KEY PAGE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -32,7 +32,7 @@ def index():
     return "Hello world"
 
 #account creation
-@app.post('/new_account')
+@app.post('/api/new_account')
 def create_new_account():
     try:
         data = request.json
@@ -45,7 +45,7 @@ def create_new_account():
 
 
 #scrape
-@app.post('/scraper')
+@app.post('/api/scraper')
 def scrape_by_url():
     print("post")
     try:
@@ -79,6 +79,8 @@ def scrape_by_url():
     except Exception as e:
         print(e)
         return {"error": "Scrape did not go through"}
+    
+
 
 
 if __name__ == '__main__':

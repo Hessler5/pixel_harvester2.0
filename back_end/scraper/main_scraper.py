@@ -21,7 +21,7 @@ def scraper(url):
     time.sleep(10)
 
     # scrolls to the bottomn of the page
-    previouse_height = driver.execute_script('return document.body.scrollHeight;')
+    # previouse_height = driver.execute_script('return document.body.scrollHeight;')
     # while True:
     #     if driver.execute_script('return document.body.scrollHeight;') >= 15000:
     #         driver.execute_script('window.scrollBy(0, 15000)')

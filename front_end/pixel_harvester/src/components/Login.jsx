@@ -5,8 +5,8 @@ function Login(){
 
     //login control
     const[user, setUser] = useState({
-        username: " ",
-        password: " "
+        username: "",
+        password: ""
     })
     function handleLoginInputs(e){
         let key = e.target.name
