@@ -57,7 +57,7 @@ def scrape_by_url():
 
         # os.remove("screenshot.png")
 
-        target = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel-harvester/back_end/server/'
+        target = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/'
 
         stream = BytesIO()
         files = []

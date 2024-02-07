@@ -22,16 +22,22 @@ def scraper(url):
 
     # scrolls to the bottomn of the page
     previouse_height = driver.execute_script('return document.body.scrollHeight;')
-    while True:
-        driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
-        time.sleep(5)
-        new_height = driver.execute_script('return document.body.scrollHeight;')
-        if previouse_height == new_height:
-            break
-        previouse_height = new_height
+    # while True:
+    #     if driver.execute_script('return document.body.scrollHeight;') >= 15000:
+    #         driver.execute_script('window.scrollBy(0, 15000)')
+    #         break
+    #     else:
+    #         driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
+    #         time.sleep(10)
+    #         new_height = driver.execute_script('return document.body.scrollHeight;')
+    #         if previouse_height == new_height:
+    #             break
+    #         previouse_height = new_height
+
 
     #sets dimensions for screenshot
     width = 1336
+
     height = driver.execute_script("return Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);")
     driver.set_window_size(width, height)
 
@@ -66,6 +72,7 @@ def scraper(url):
     #opens imge and gets meta data
     image_file = Image.open('./screenshot.png', 'r')
     width, height = image_file.size
+    print(height)
 
     #indexes image as pix and sets color key
     pix = image_file.load()
@@ -73,7 +80,6 @@ def scraper(url):
 
     #for testing purposes this is the conversion of rgb (255, 0, 0, 255) when passed through pillow
     #(255, 0, 0, 255) == (234, 51, 35, 255)
-
     #initialize cusotm class with helper tools
     extract = Extractor()
 

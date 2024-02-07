@@ -101,17 +101,18 @@ function Scraper(){
     }
 
     return (
-        <>
-            <p>website to scrape:</p>
+        <div className = {images.length == 0? "h-screen flex justify-center flex-wrap" : "h-full flex justify-center flex-wrap"}>
             <form onSubmit={handleSubmit}>
-            <input type="text" id="urlname" name="name" onChange={handleUrl} value={url}/>
-            <input type="submit" value="Send Request"/>
+              <div className = "w-screen flex justify-center">
+                <input className = "text-black border-black border-solid border-2 rounded-md pl-1.5 w-2/4" type="text" id="urlname" name="name" onChange={handleUrl} placeholder="Website to Scrape" value={url}/>
+                <input className = "scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 ml-1.5" type="submit" value="Send Request"/>
+              </div>
             </form>
             <div className = "flex flex-wrap justify-center">
                 {image_cards}
             </div>
-            <button onClick={downloadImages}>Download</button>
-        </>
+            {images.length == 0? null : <button className = "text-2xl scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 m-3" onClick={downloadImages}>Download</button>}
+        </div>
     )
 }
 
