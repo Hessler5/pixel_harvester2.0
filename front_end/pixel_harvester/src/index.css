@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    font-family: 'Quantico', sans-serif;
+    color: white;
+}
+
+.background {
+    /* background-color: rgb(176, 181, 191); */
+    height: 100%;
+    background: rgb(168,167,180);
+    background: linear-gradient(0deg, rgba(168,167,180,1) 0%, rgba(255,255,255,1) 100%);
+}
+
+/* header */
+.header {
+    background-color: rgb(0,19,42,255);
+}
+
+/* scraper */
+.scrape_submit {
+    background-color: rgb(91, 91, 94);
+}
+
+/* image cards */
+.product_card {
+    background-color: rgb(0,19,42,255);
+}
+
+/* login */
+.login {
+    background-color: rgb(0,19,42,255);
+}
+
