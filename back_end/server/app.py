@@ -4,7 +4,6 @@ sys.path.append('../')
 from flask import Flask, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from models import db, User, Scrape
 from scraper.main_scraper import scraper
 from datetime import date
 from flask import send_file
@@ -14,6 +13,8 @@ from zipfile import ZipFile
 import os
 from dotenv import dotenv_values
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
+from models import db, User, Scrape
 
 app = Flask(__name__)
 
@@ -27,22 +28,59 @@ migrate = Migrate(app, db)
 CORS(app)
 db.init_app(app)
 
+bcrypt = Bcrypt(app)
+
 @app.get('/')
 def index():
     return "Hello world"
+
+#account authentication
+@app.get('/api/user')
+def check_logged_in_user():
+    user = User.query.filter(User.id == session.get('user_id')).first()
+    if user:
+        return user.to_dict()
+    else:
+        return {'message': '401: Not Authorized'}, 401
 
 #account creation
 @app.post('/api/new_account')
 def create_new_account():
     try:
         data = request.json
-        new_user = User(username = data.get("username"), password = data.get("password"))
+        password_hash = bcrypt.generate_password_hash(data.get("password"))
+        new_user = User(username = data.get("username"), password_hash = password_hash)
         db.session.add(new_user)
         db.session.commit()
-        return new_user.to_dict(), 201
-    except:
-        return {"Error": "something went wrong"}
 
+        session['user_id'] = new_user.id
+
+        return new_user.to_dict(), 201
+    except Exception as e:
+        print(e)
+        return {"Error": "something went wrong"}, 404
+
+#account login
+@app.post('/api/login')
+def login_user():
+    try:
+        data = request.json
+        user = User.query.filter(User.username == data.get('username')).first()
+        if bcrypt.check_password_hash(user.password_hash, data.get('password')):
+            session['user_id'] = user.id
+            return user.to_dict(), 201
+        else:
+            return {"Error": "user not found"}, 404
+    
+    except Exception as e:
+        print(e)
+        return {"Error": "something went wrong"}, 404
+
+#account logout
+@app.delete('/api/logout')
+def logout_user():
+    session['user_id'] = None
+    return {'message': '204: No Content'}, 204
 
 #scrape
 @app.post('/api/scraper')

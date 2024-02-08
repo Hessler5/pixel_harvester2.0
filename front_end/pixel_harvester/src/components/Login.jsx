@@ -1,7 +1,17 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 
 
 function Login(){
+
+    const navigate = useNavigate();
+
+    //check for logged in user
+    useEffect(() => {
+        fetch('/api/user')
+        .then(() => navigate('/'))
+    }, [])
+   
 
     //login control
     const[user, setUser] = useState({
@@ -15,8 +25,33 @@ function Login(){
     }
 
     //account creation route
-    function handleNewAccount() {
-        fetch()
+    function handleNewAccount(e) {
+        e.preventDefault()
+        fetch('/api/new_account', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+              },
+            body: JSON.stringify(user)
+        }).then((resp) => resp.json())
+        .then((user) => {console.log(user)
+            navigate("/user")
+        })
+    }
+
+    //account login route
+    function handleLogin(e) {
+        e.preventDefault()
+        fetch('/api/login', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+              },
+            body: JSON.stringify(user)
+        }).then((resp) => resp.json())
+        .then((user) => {console.log(user)
+            navigate("/user")
+        })
     }
 
     return (
@@ -33,7 +68,7 @@ function Login(){
                 </div>
                 <div>
                     <button className = "m-3 scrape_submit ml-2 p-1.5 rounded-md" onClick={handleNewAccount}>Signup</button>
-                    <button className = "m-3 scrape_submit ml-2 p-1.5 rounded-md">Login</button>
+                    <button className = "m-3 scrape_submit ml-2 p-1.5 rounded-md" onClick={handleLogin}>Login</button>
                 </div>
             </form>
         </div>

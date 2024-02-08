@@ -3,6 +3,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.hybrid import hybrid_property
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -10,11 +11,12 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 
+
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key = True)
-    user_name = db.Column(db.String, nullable = False)
-    password_hash = db.Column(db.String)
+    username = db.Column(db.String, nullable = False)
+    password_hash = db.Column(db.String, nullable = False)
 
 
     def __repr__(self):
