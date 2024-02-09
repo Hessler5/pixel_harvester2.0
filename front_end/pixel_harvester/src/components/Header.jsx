@@ -1,23 +1,26 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import {useNavigate} from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+
+
 
 
 function Header({user}) {
 
     const navigate = useNavigate();
+    const location = useLocation();
     
     //handles logging out
     function handleLogout(){
         fetch('/api/logout', {
             method: "DELETE"
         }).then(resp => {
-            console.log('hi')
             resp.json()})
         .then(data => {
             navigate("/")
         })
     }
+
+    console.log(location)
 
     return (
         <div className = "header flex justify-between">
@@ -28,8 +31,9 @@ function Header({user}) {
                 <h3 className = "text-3xl m-3">Last Scrape:</h3>
             </div>
             <div className = 'flex items-end mr-2'>
-                <button className = 'm-3' onClick={handleLogout}>LOG OUT</button>
-                <button className = 'm-3'><Link to="/about">ABOUT</Link></button>
+                {location.pathname == '/about'? <button className = 'm-3'><Link to="/user">HOME</Link></button>: <button className = 'm-3'><Link to="/about">ABOUT</Link></button>}
+                {user? <button className = 'm-3' onClick={handleLogout}>LOG OUT</button> : <button className = 'm-3' onClick={handleLogout}>LOG IN</button>}
+
             </div>
         </div>
     )
