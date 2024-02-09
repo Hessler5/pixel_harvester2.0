@@ -17,8 +17,6 @@ function Header({user}) {
             navigate("/")})
     }
 
-    console.log(user)
-
     return (
         <div className = "header flex justify-between">
             <img className = "w-56 h-56 ml-2" src={"src/assets/Pixel_Harvester_Logo.webp"}/>

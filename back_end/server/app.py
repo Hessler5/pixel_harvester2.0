@@ -15,6 +15,7 @@ from dotenv import dotenv_values
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from models import db, User, Scrape
+from datetime import date
 
 app = Flask(__name__)
 
@@ -80,13 +81,56 @@ def logout_user():
     session['user_id'] = None
     return {'message': '204: No Content'}, 204
 
-#scrape
+#logged in scrape
 @app.post('/api/scraper')
 def scrape_by_url():
     print("post")
     try:
         data = request.json
-        new_scrape = Scrape(url = data.get("url"), date = date.today(), user_id = 1)
+        new_scrape = Scrape(url = data.get("url"), date = date.today(), user_id = data.get("id"))
+        db.session.add(new_scrape)
+        db.session.commit()
+        # scraper(new_scrape.url)
+
+        # os.remove("screenshot.png")
+
+        target = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/'
+
+        stream = BytesIO()
+        files = []
+        with ZipFile(stream, 'w') as zf:
+            for file in glob(os.path.join(target, '*.png')):
+                files.append(file)
+                zf.write(file, os.path.basename(file))
+        stream.seek(0)
+
+        # for file in files:
+        #     os.remove(file)
+
+        return send_file(
+            stream,
+            as_attachment=True,
+            download_name='archive.zip'
+            )
+    
+    except Exception as e:
+        print(e)
+        return {"error": "Scrape did not go through"}
+    
+
+    
+@app.post('/api/public/scraper')
+def public_scrape_by_url():
+    print(session.get('hasTrial'))
+    if session.get('hasTrial') == False:
+        return {"error": "already used free trial"}
+    else:
+        session['hasTrial'] = False
+        
+
+    try:
+        data = request.json
+        new_scrape = Scrape(url = data.get("url"), date = date.today())
         db.session.add(new_scrape)
         db.session.commit()
         # scraper(new_scrape.url)

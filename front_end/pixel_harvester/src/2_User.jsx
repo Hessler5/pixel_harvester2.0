@@ -26,7 +26,7 @@ function User(){
         <>
             <Header user = {user}/>
             <h1 className="text-6xl font-bold underline text-center my-2 text-black">Harvester</h1>
-            <Scraper />
+            <Scraper user = {user}/>
         </>
     )
 }

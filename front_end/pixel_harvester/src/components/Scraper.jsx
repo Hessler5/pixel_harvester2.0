@@ -4,7 +4,7 @@ import JSZip from 'jszip'
 import Image_Card from './Image_Card';
 
 
-function Scraper(){
+function Scraper({user}){
     //initilaize zip library
     var zip = new JSZip();
 
@@ -28,15 +28,58 @@ function Scraper(){
       let newUrl = e.target.value
       setUrl(newUrl)
     }
-    
-    //handles submit or URL for a new scrape
-    function handleSubmit(e){
+
+    function scrapeRouter(e) {
       e.preventDefault()
+      if(user){
+        handleSubmit()
+      } else {
+        handlePublicSubmit()
+      }
+    }
+    
+    //handles submit or URL for a new scrape for logged in users
+    function handleSubmit(){
+        let newScrape = {
+        "id": user.id,
+        "url": url
+        }
+      //posts a new scrape to the server 
+      fetch(`/api/scraper`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newScrape)
+      })
+      //converst data stream to blob
+      .then(resp => resp.blob())
+      //converst blob to a zip file
+      .then(blob => zip.loadAsync(blob))
+      //converts ever file in the zip to a blob and creates a url eleement
+      .then(data => {
+        let new_image_cards = []
+        let image_count = 0
+        for (let img in data.files) {
+          let bits = data.files[img]._data.compressedContent
+          let blob = new Blob([bits], { type: 'image/png' })
+          const url = URL.createObjectURL(blob);
+          //to embed the images the source of the new image is the url for the image
+          image_count ++
+          let new_image = [url, true, `File ${image_count}`, blob]
+          new_image_cards.push(new_image)
+        }
+        setImages(new_image_cards)
+      })
+    }
+
+    function handlePublicSubmit() {
+      console.log("test")
       let newScrape = {
         "url": url
-      }
-      //posts a new scrape to the server
-      fetch(`/api/scraper`, {
+        }
+      //posts a new scrape to the server 
+      fetch(`/api/public/scraper`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -102,7 +145,7 @@ function Scraper(){
 
     return (
         <div className = {images.length == 0? "h-screen flex justify-center flex-wrap" : "h-full flex justify-center flex-wrap"}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit= {scrapeRouter}>
               <div className = "w-screen flex justify-center">
                 <input className = "text-black border-black border-solid border-2 rounded-md pl-1.5 w-2/4" type="text" id="urlname" name="name" onChange={handleUrl} placeholder="Website to Scrape" value={url}/>
                 <input className = "scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 ml-1.5" type="submit" value="Send Request"/>
