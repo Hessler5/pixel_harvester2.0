@@ -32,14 +32,18 @@ function Login(){
     //account creation route
     function handleNewAccount(e) {
         e.preventDefault()
+        console.log("hi")
         fetch('/api/new_account', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
               },
             body: JSON.stringify(user)
-        }).then((resp) => resp.json())
+        }).then((resp) => {
+            console.log("hi")
+            resp.json()})
         .then((user) => {
+            console.log("hi")
             navigate("/user")
         })
     }

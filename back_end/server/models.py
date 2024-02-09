@@ -4,7 +4,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-from datetime import date
+
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -19,6 +19,9 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, nullable = False)
     password_hash = db.Column(db.String, nullable = False)
 
+    scrapes = db.relationship('Scrape', back_populates = 'user', cascade = 'all, delete-orphan')
+
+    serialize_rules = ['-scrapes.user', '-password_hash']
 
     def __repr__(self):
         return f'<User {self.id}>'
@@ -29,10 +32,11 @@ class Scrape(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key = True)
     url = db.Column(db.String, nullable = False)
     date = db.Column(db.String)
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    # print(date.today())
+    user = db.relationship('User', back_populates = 'scrapes')
 
+    serialize_rules = ['-user.scrapes']
 
     def __repr__(self):
         return f'<Scrape {self.id}>'

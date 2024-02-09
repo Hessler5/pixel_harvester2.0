@@ -15,6 +15,7 @@ function User(){
         .then(resp => resp.json())
         .then(data => {
             if(!data.username){
+                    console.log(data)
                     navigate("/")
             }else {
                 setUser(data)

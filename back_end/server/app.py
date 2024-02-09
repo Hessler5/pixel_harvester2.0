@@ -52,6 +52,7 @@ def create_new_account():
         password_hash = bcrypt.generate_password_hash(data.get("password"))
         new_user = User(username = data.get("username"), password_hash = password_hash)
         db.session.add(new_user)
+        db.session.commit()
         session['user_id'] = new_user.id
 
         return new_user.to_dict(), 201
@@ -84,9 +85,15 @@ def logout_user():
 #logged in scrape
 @app.post('/api/scraper')
 def scrape_by_url():
-    print("post")
     try:
         data = request.json
+
+        #checks for daily uses
+        scrapes = Scrape.query.filter(Scrape.user_id == data.get("id") and date == date.today()).all()
+        if len(scrapes) >= 3:
+            return {"error": "all scraped used for the day"}
+        
+
         new_scrape = Scrape(url = data.get("url"), date = date.today(), user_id = data.get("id"))
         db.session.add(new_scrape)
         db.session.commit()
