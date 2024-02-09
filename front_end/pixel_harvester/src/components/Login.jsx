@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link} from "react-router-dom";
 
 
 function Login(){
@@ -9,7 +9,12 @@ function Login(){
     //check for logged in user
     useEffect(() => {
         fetch('/api/user')
-        .then(() => navigate('/'))
+        .then(resp => resp.json())
+        .then((data) => {
+        if (data.username){
+            navigate('/user')
+        }
+        })
     }, [])
    
 
@@ -34,7 +39,7 @@ function Login(){
               },
             body: JSON.stringify(user)
         }).then((resp) => resp.json())
-        .then((user) => {console.log(user)
+        .then((user) => {
             navigate("/user")
         })
     }
@@ -49,13 +54,14 @@ function Login(){
               },
             body: JSON.stringify(user)
         }).then((resp) => resp.json())
-        .then((user) => {console.log(user)
+        .then((user) => {
             navigate("/user")
         })
     }
 
     return (
         <div className = "login flex justify-center flex-wrap pb-3">
+            <button className = "m-3 scrape_submit ml-2 p-1.5 rounded-md absolute right-0"><Link to="/about">ABOUT</Link></button>
             <img className = "w-1/5 h-1/5" src={"src/assets/Pixel_Harvester_Logo.webp"}/>
             <form className="w-full flex justify-center flex-wrap">
                 <div className="w-full flex justify-center m-3">

@@ -41,7 +41,7 @@ def check_logged_in_user():
     if user:
         return user.to_dict()
     else:
-        return {'message': '401: Not Authorized'}, 401
+        return {'message': '401: Not Authorized'}
 
 #account creation
 @app.post('/api/new_account')
@@ -51,8 +51,6 @@ def create_new_account():
         password_hash = bcrypt.generate_password_hash(data.get("password"))
         new_user = User(username = data.get("username"), password_hash = password_hash)
         db.session.add(new_user)
-        db.session.commit()
-
         session['user_id'] = new_user.id
 
         return new_user.to_dict(), 201
