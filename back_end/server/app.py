@@ -5,6 +5,7 @@ from flask import Flask, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from scraper.main_scraper import scraper
+from scraper.preview import preview_scraper
 from datetime import date
 from flask import send_file
 from glob import glob
@@ -40,7 +41,8 @@ def index():
 def check_logged_in_user():
     user = User.query.filter(User.id == session.get('user_id')).first()
     if user:
-        return user.to_dict()
+        pagination = Scrape.query.filter(Scrape.user_id == user.id).order_by(Scrape.date).paginate()
+        return [user.to_dict(rules = ["-scrapes"]), [p.to_dict(rules = ["-user"]) for p in pagination.items]]
     else:
         return {'message': '401: Not Authorized'}
 
@@ -82,6 +84,35 @@ def logout_user():
     session['user_id'] = None
     return {'message': '204: No Content'}, 204
 
+#preview page
+@app.post('/api/preview')
+def scrape_preview():
+    try:
+        if session.get('hasTrial') == False:
+            return {"error": "already used free trial"}
+    
+        data = request.json
+        preview_scraper(data.get('url'))
+
+        screenshot = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/preview_screenshot.png'
+
+        stream = BytesIO()
+        with ZipFile(stream, 'w') as zf:
+            zf.write(screenshot, os.path.basename(screenshot))
+        stream.seek(0)
+
+        os.remove("preview_screenshot.png")
+
+        return send_file(
+            stream,
+            as_attachment=True,
+            download_name='archive.zip'
+            )
+
+    except Exception as e:
+        print(e)
+        return {"error": "Scrape did not go through"}
+
 #logged in scrape
 @app.post('/api/scraper')
 def scrape_by_url():
@@ -97,9 +128,9 @@ def scrape_by_url():
         new_scrape = Scrape(url = data.get("url"), date = date.today(), user_id = data.get("id"))
         db.session.add(new_scrape)
         db.session.commit()
-        # scraper(new_scrape.url)
+        scraper(new_scrape.url)
 
-        # os.remove("screenshot.png")
+        os.remove("screenshot.png")
 
         target = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/'
 
@@ -111,8 +142,8 @@ def scrape_by_url():
                 zf.write(file, os.path.basename(file))
         stream.seek(0)
 
-        # for file in files:
-        #     os.remove(file)
+        for file in files:
+            os.remove(file)
 
         return send_file(
             stream,
@@ -128,7 +159,6 @@ def scrape_by_url():
     
 @app.post('/api/public/scraper')
 def public_scrape_by_url():
-    print(session.get('hasTrial'))
     if session.get('hasTrial') == False:
         return {"error": "already used free trial"}
     else:
@@ -140,9 +170,9 @@ def public_scrape_by_url():
         new_scrape = Scrape(url = data.get("url"), date = date.today())
         db.session.add(new_scrape)
         db.session.commit()
-        # scraper(new_scrape.url)
+        scraper(new_scrape.url)
 
-        # os.remove("screenshot.png")
+        os.remove("screenshot.png")
 
         target = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/'
 
@@ -154,8 +184,8 @@ def public_scrape_by_url():
                 zf.write(file, os.path.basename(file))
         stream.seek(0)
 
-        # for file in files:
-        #     os.remove(file)
+        for file in files:
+            os.remove(file)
 
         return send_file(
             stream,

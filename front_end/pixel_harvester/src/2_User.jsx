@@ -14,8 +14,7 @@ function User(){
         fetch('/api/user')
         .then(resp => resp.json())
         .then(data => {
-            if(!data.username){
-                    console.log(data)
+            if(!data[1]){
                     navigate("/")
             }else {
                 setUser(data)
@@ -23,11 +22,18 @@ function User(){
             })
         }, [])
 
+    function updateUser(newScrape) {
+        let userToUpdate = {...user}
+        userToUpdate[1].push(newScrape)
+        console.log(userToUpdate)
+        setUser(userToUpdate)
+    }
+
     return(
         <>
             <Header user = {user}/>
             <h1 className="text-6xl font-bold underline text-center my-2 text-black">Harvester</h1>
-            <Scraper user = {user}/>
+            <Scraper user = {user} updateUser = {updateUser}/>
         </>
     )
 }

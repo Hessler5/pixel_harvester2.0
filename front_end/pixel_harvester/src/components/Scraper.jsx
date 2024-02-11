@@ -2,14 +2,27 @@ import React, { useState, useEffect } from 'react'
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip'
 import Image_Card from './Image_Card';
+import Preview from './Preview';
 
 
-function Scraper({user}){
+function Scraper({user, updateUser}){
     //initilaize zip library
     var zip = new JSZip();
 
+    //holds preview image
+    const [preview, setPreview] = useState([false, 0])
+
+    //holds loadinf state
+    const[isLoading, setIsLoading] = useState(false)
+
     //holds image cards
     const[images, setImages] = useState([])
+
+    //calculates todays date
+    const date = new Date();
+    let month = `0${date.getMonth() + 1}`
+    let day = `0${date.getDate()}`
+    let todays_date = `${date.getFullYear()}-${month.slice(-2)}-${day.slice(-2)}`
 
     //handles True vs False image selection
     function isTrue(url) {
@@ -29,19 +42,53 @@ function Scraper({user}){
       setUrl(newUrl)
     }
 
-    function scrapeRouter(e) {
-      e.preventDefault()
+    function scrapeRouter() {
       if(user){
         handleSubmit()
       } else {
         handlePublicSubmit()
       }
     }
+
+    //handles scrape preview
+    function scrapePreview(e){
+      e.preventDefault()
+      let newScrape = {
+        "url": url
+        }
+      
+        fetch('/api/preview', {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newScrape)
+        })
+        .then(resp => resp.blob())
+        .then(blob => zip.loadAsync(blob))
+        .then(data => {
+        let bits = data.files['preview_screenshot.png']._data.compressedContent
+        let blob = new Blob([bits], { type: 'image/png' })
+        const url = URL.createObjectURL(blob);
+        let preview_image = [true, url]
+        setPreview(preview_image)
+      })
+    }
+
+    function handleReject() {
+      setPreview([false, 0])
+    }
+
+    function handleAccept() {
+      setPreview([false, 0])
+      setIsLoading(true)
+      scrapeRouter()
+    }
     
     //handles submit or URL for a new scrape for logged in users
     function handleSubmit(){
         let newScrape = {
-        "id": user.id,
+        "id": user[0].id,
         "url": url
         }
       //posts a new scrape to the server 
@@ -69,12 +116,17 @@ function Scraper({user}){
           let new_image = [url, true, `File ${image_count}`, blob]
           new_image_cards.push(new_image)
         }
+        updateUser({
+          "id": user[0].id,
+          "url": url,
+          "date": todays_date
+        })
         setImages(new_image_cards)
+        setIsLoading(false)
       })
     }
 
     function handlePublicSubmit() {
-      console.log("test")
       let newScrape = {
         "url": url
         }
@@ -104,6 +156,7 @@ function Scraper({user}){
           new_image_cards.push(new_image)
         }
         setImages(new_image_cards)
+        setIsLoading(false)
       })
     }
 
@@ -144,15 +197,17 @@ function Scraper({user}){
     }
 
     return (
-        <div className = {images.length == 0? "h-screen flex justify-center flex-wrap" : "h-full flex justify-center flex-wrap"}>
-            <form onSubmit= {scrapeRouter}>
+        <div className = {images.length == 0 && !preview[0]? "h-screen flex justify-center flex-wrap" : "h-full flex justify-center flex-wrap"}>
+            {isLoading? <iframe src="https://lottie.host/embed/480b0bb7-f98f-49bc-b1fd-29e858abfd5f/5rx3yz8Njq.json"></iframe>: null}
+            {preview[0] || isLoading? null:
+            <form onSubmit= {scrapePreview}>
               <div className = "w-screen flex justify-center">
                 <input className = "text-black border-black border-solid border-2 rounded-md pl-1.5 w-2/4" type="text" id="urlname" name="name" onChange={handleUrl} placeholder="Website to Scrape" value={url}/>
                 <input className = "scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 ml-1.5" type="submit" value="Send Request"/>
               </div>
-            </form>
+            </form>}
             <div className = "flex flex-wrap justify-center">
-                {image_cards}
+                {preview[0]? <Preview img = {preview[1]} handleAccept = {handleAccept} handleReject = {handleReject}/> :image_cards}
             </div>
             {images.length == 0? null : <button className = "text-2xl scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 m-3" onClick={downloadImages}>Download</button>}
         </div>

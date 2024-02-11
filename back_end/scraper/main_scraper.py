@@ -9,7 +9,6 @@ def scraper(url):
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless")
-    # chrome_options.page_load_strategy = 'normal'
 
     service = webdriver.ChromeService(executable_path = PATH)
     driver = webdriver.Chrome(service=service, options=chrome_options)
