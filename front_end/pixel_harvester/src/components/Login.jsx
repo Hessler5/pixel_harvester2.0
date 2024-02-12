@@ -11,9 +11,7 @@ function Login(){
         fetch('/api/user')
         .then(resp => resp.json())
         .then((data) => {
-            console.log(data[0])
         if (data[1]){
-            console.log(data[0])
             navigate('/user')
         }
         })
@@ -34,7 +32,6 @@ function Login(){
     //account creation route
     function handleNewAccount(e) {
         e.preventDefault()
-        console.log("hi")
         fetch('/api/new_account', {
             method: "POST",
             headers: {

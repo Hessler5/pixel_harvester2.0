@@ -1,8 +1,9 @@
 
 class Extractor():
-    def key_identifier(self, pixel_array, key):
+    def key_identifier(self, pixel_array, outerArray, key):
         if set(pixel_array) == set([key]):
-            return True
+            if not key in outerArray:
+                return True
             
     def length_finder(self, x, y, image, width, key):
         image_length = 0

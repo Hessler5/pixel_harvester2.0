@@ -84,16 +84,22 @@ def logout_user():
     session['user_id'] = None
     return {'message': '204: No Content'}, 204
 
+
 #preview page
 @app.post('/api/preview')
 def scrape_preview():
     try:
-        if session.get('hasTrial') == False:
-            return {"error": "already used free trial"}
-    
         data = request.json
-        preview_scraper(data.get('url'))
 
+        #runs trial and total scrape checks
+        if data.get('id') == "none":
+            if session.get('hasTrial') == False:
+                return {"error": "Already used free trial"}, 400
+        else:
+            scrapes = Scrape.query.filter(Scrape.user_id == data.get("id") and date == date.today()).all()
+            if len(scrapes) >= 3:
+                return {"error": "All scrapes used for the day"}, 400
+        preview_scraper(data.get('url'))
         screenshot = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/preview_screenshot.png'
 
         stream = BytesIO()
@@ -111,7 +117,7 @@ def scrape_preview():
 
     except Exception as e:
         print(e)
-        return {"error": "Scrape did not go through"}
+        return {"error": "Scrape did not go through"}, 400
 
 #logged in scrape
 @app.post('/api/scraper')
@@ -122,7 +128,7 @@ def scrape_by_url():
         #checks for daily uses
         scrapes = Scrape.query.filter(Scrape.user_id == data.get("id") and date == date.today()).all()
         if len(scrapes) >= 3:
-            return {"error": "all scraped used for the day"}
+            return {"error": "All scrapes used for the day"}, 400
         
 
         new_scrape = Scrape(url = data.get("url"), date = date.today(), user_id = data.get("id"))
@@ -153,14 +159,14 @@ def scrape_by_url():
     
     except Exception as e:
         print(e)
-        return {"error": "Scrape did not go through"}
+        return {"error": "Scrape did not go through"}, 400
     
 
     
 @app.post('/api/public/scraper')
 def public_scrape_by_url():
     if session.get('hasTrial') == False:
-        return {"error": "already used free trial"}
+        return {"error": "Already used free trial"}, 400
     else:
         session['hasTrial'] = False
         
@@ -195,7 +201,7 @@ def public_scrape_by_url():
 
     except Exception as e:
         print(e)
-        return {"error": "Scrape did not go through"}
+        return {"error": "Scrape did not go through"}, 400
     
 
 

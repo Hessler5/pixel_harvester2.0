@@ -18,6 +18,9 @@ function Scraper({user, updateUser}){
     //holds image cards
     const[images, setImages] = useState([])
 
+    //handles error messages
+    const[err, setErr] = useState(false)
+
     //calculates todays date
     const date = new Date();
     let month = `0${date.getMonth() + 1}`
@@ -42,6 +45,7 @@ function Scraper({user, updateUser}){
       setUrl(newUrl)
     }
 
+    //handles public vs. logged in scrapes
     function scrapeRouter() {
       if(user){
         handleSubmit()
@@ -53,10 +57,22 @@ function Scraper({user, updateUser}){
     //handles scrape preview
     function scrapePreview(e){
       e.preventDefault()
+      setImages([])
+      setErr(false)
+      setIsLoading(true)
+
+      let userId = ""
+
+      if(user){
+        userId = user[0].id
+      } else {
+        userId = "none"
+      }
+
       let newScrape = {
+        "id": userId,
         "url": url
         }
-      
         fetch('/api/preview', {
           method: "POST",
           headers: {
@@ -64,21 +80,41 @@ function Scraper({user, updateUser}){
           },
           body: JSON.stringify(newScrape)
         })
-        .then(resp => resp.blob())
-        .then(blob => zip.loadAsync(blob))
+        //converst data stream to blob or catches 400 errors
+        .then(resp => {
+          if(resp.status == 400) {
+            return resp.json()
+          } else {
+          return resp.blob()}})
+        //converst data stream to blob or catches 400 errors
+        .then(data => {
+          if (data instanceof Blob) {
+            return zip.loadAsync(data)
+          } else {
+            setErr(data)
+          }
+          })
         .then(data => {
         let bits = data.files['preview_screenshot.png']._data.compressedContent
         let blob = new Blob([bits], { type: 'image/png' })
         const url = URL.createObjectURL(blob);
         let preview_image = [true, url]
+        setIsLoading(false)
         setPreview(preview_image)
+      })
+      // catches server error
+      .catch((error) => {
+        console.log("Harvester Failed")
+        setIsLoading(false)
       })
     }
 
+    //preview rejection
     function handleReject() {
       setPreview([false, 0])
     }
 
+    //accept preview
     function handleAccept() {
       setPreview([false, 0])
       setIsLoading(true)
@@ -100,9 +136,19 @@ function Scraper({user, updateUser}){
         body: JSON.stringify(newScrape)
       })
       //converst data stream to blob
-      .then(resp => resp.blob())
-      //converst blob to a zip file
-      .then(blob => zip.loadAsync(blob))
+      .then(resp => {
+        if(resp.status == 400) {
+          return resp.json()
+        } else {
+        return resp.blob()}})
+      //converst data stream to blob or catches 400 errors
+      .then(data => {
+        if (data instanceof Blob) {
+          return zip.loadAsync(data)
+        } else {
+          setErr(data)
+        }
+        })
       //converts ever file in the zip to a blob and creates a url eleement
       .then(data => {
         let new_image_cards = []
@@ -124,6 +170,11 @@ function Scraper({user, updateUser}){
         setImages(new_image_cards)
         setIsLoading(false)
       })
+      //catches server error
+      .catch((error) => {
+        console.log("Harvester Failed")
+        setIsLoading(false)
+      })
     }
 
     function handlePublicSubmit() {
@@ -138,10 +189,20 @@ function Scraper({user, updateUser}){
         },
         body: JSON.stringify(newScrape)
       })
-      //converst data stream to blob
-      .then(resp => resp.blob())
-      //converst blob to a zip file
-      .then(blob => zip.loadAsync(blob))
+      //converst data stream to blob or catches 400 errors
+      .then(resp => {
+        if(resp.status == 400) {
+          return resp.json()
+        } else {
+        return resp.blob()}})
+      //unzips or returns an error message
+      .then(data => {
+        if (data instanceof Blob) {
+          return zip.loadAsync(data)
+        } else {
+          setErr(data)
+        }
+        })
       //converts ever file in the zip to a blob and creates a url eleement
       .then(data => {
         let new_image_cards = []
@@ -157,6 +218,11 @@ function Scraper({user, updateUser}){
         }
         setImages(new_image_cards)
         setIsLoading(false)
+      })
+      //catches server error
+      .catch((error) => {
+      console.log("Harvester Failed")
+      setIsLoading(false)
       })
     }
 
@@ -206,6 +272,8 @@ function Scraper({user, updateUser}){
                 <input className = "scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 ml-1.5" type="submit" value="Send Request"/>
               </div>
             </form>}
+            {err? <h3 className = "text-black text-3xl">{err.error}</h3> 
+            : null}
             <div className = "flex flex-wrap justify-center">
                 {preview[0]? <Preview img = {preview[1]} handleAccept = {handleAccept} handleReject = {handleReject}/> :image_cards}
             </div>

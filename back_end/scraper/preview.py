@@ -13,7 +13,6 @@ def preview_scraper(url):
     # opens the site twice in order to get around first visit promo pop-ups
     driver.get(f'{url}')
     driver.get(f'{url}')
-
     #initial sleep to allow for loading
     time.sleep(10)
 

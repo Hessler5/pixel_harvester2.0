@@ -46,13 +46,13 @@ def scraper(url):
                                 for (let img of images) {
                                       img.style.zIndex = '1000';
                                     img.style.borderRadius = "0";
-                                    img.style.borderColor = "rgb(255,0,0)"; 
+                                    img.style.borderColor = "rgb(247, 255, 122, 255)"; 
                                     img.style.borderWidth = "1px";
                                     img.style.borderStyle = "solid";}
                                 reference_square = document.createElement('div');
                                 reference_square.style.width = '1px';
                                 reference_square.style.height = '1px';
-                                reference_square.style.backgroundColor = 'rgb(255, 0, 0, 255)';
+                                reference_square.style.backgroundColor = 'rgb(247, 255, 122, 255)';
                                 reference_square.style.position = 'absolute';
                                 reference_square.style.top = '0';
                                 reference_square.style.zIndex = 1000;                
@@ -71,7 +71,6 @@ def scraper(url):
     #opens imge and gets meta data
     image_file = Image.open('./screenshot.png', 'r')
     width, height = image_file.size
-    print(height)
 
     #indexes image as pix and sets color key
     pix = image_file.load()
@@ -82,7 +81,6 @@ def scraper(url):
     #initialize cusotm class with helper tools
     extract = Extractor()
 
-    print(pix[-1, 0])
     #counts images for file name
     image_count = 0
     #loops through every pixel in the image
@@ -90,14 +88,18 @@ def scraper(url):
         for x in range(1, width):
                 #checks each pixel to see if its the start of an image
                 if x - 1 >= 0 and y - 1 >= 0 and y + 2 < height and x + 2 < width:
-                    testarray = [pix[x, y], pix[x + 1, y], pix[x + 2, y], pix[x, y + 1], pix[x, y + 2], pix[x, y - 1], pix[x - 1, y]]
-                    if extract.key_identifier(testarray, color_key):
-                        #if an image is detected helper functions are run and subimage is cropped and saved
-                        image_count += 1 
-                        img_length = extract.length_finder(x, y, pix, width, color_key)
-                        img_height = extract.height_finder(x, y, pix, height, color_key)
-                        if img_length > 1 and img_height > 1:
-                            crop = image_file.crop((x + 1, y + 1, x + img_length, y + img_height))
-                            crop.save(f"image {image_count}.png", 'PNG')
+                    try:
+                        testarray = [pix[x, y], pix[x + 1, y], pix[x + 2, y], pix[x, y + 1], pix[x, y + 2], pix[x, y - 1], pix[x - 1, y]]
+                        outerArray = [pix[x - 2, y], pix[x, y - 2]]
+                        if extract.key_identifier(testarray, outerArray ,color_key):
+                            #if an image is detected helper functions are run and subimage is cropped and saved
+                            image_count += 1 
+                            img_length = extract.length_finder(x, y, pix, width, color_key)
+                            img_height = extract.height_finder(x, y, pix, height, color_key)
+                            if img_length > 1 and img_height > 1:
+                                crop = image_file.crop((x + 1, y + 1, x + img_length, y + img_height))
+                                crop.save(f"image {image_count}.png", 'PNG')
+                    except:
+                         break
 
 
