@@ -99,7 +99,7 @@ def scrape_preview():
             scrapes = Scrape.query.filter(Scrape.user_id == data.get("id") and date == date.today()).all()
             if len(scrapes) >= 3:
                 return {"error": "All scrapes used for the day"}, 400
-        preview_scraper(data.get('url'))
+        # preview_scraper(data.get('url'))
         screenshot = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/preview_screenshot.png'
 
         stream = BytesIO()
@@ -107,7 +107,7 @@ def scrape_preview():
             zf.write(screenshot, os.path.basename(screenshot))
         stream.seek(0)
 
-        os.remove("preview_screenshot.png")
+        # os.remove("preview_screenshot.png")
 
         return send_file(
             stream,
@@ -176,9 +176,9 @@ def public_scrape_by_url():
         new_scrape = Scrape(url = data.get("url"), date = date.today())
         db.session.add(new_scrape)
         db.session.commit()
-        scraper(new_scrape.url)
+        # scraper(new_scrape.url)
 
-        os.remove("screenshot.png")
+        # os.remove("screenshot.png")
 
         target = '/Users/ethanhessler/Development/Code/phase-5/phase-5-project/pixel_harvester2.0/back_end/server/'
 
@@ -190,8 +190,8 @@ def public_scrape_by_url():
                 zf.write(file, os.path.basename(file))
         stream.seek(0)
 
-        for file in files:
-            os.remove(file)
+        # for file in files:
+        #     os.remove(file)
 
         return send_file(
             stream,

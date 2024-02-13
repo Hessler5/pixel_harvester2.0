@@ -6,6 +6,7 @@ import Preview from './Preview';
 
 
 function Scraper({user, updateUser}){
+
     //initilaize zip library
     var zip = new JSZip();
 
@@ -15,8 +16,23 @@ function Scraper({user, updateUser}){
     //holds loadinf state
     const[isLoading, setIsLoading] = useState(false)
 
-    //holds image cards
+    //holds image info
     const[images, setImages] = useState([])
+
+    //holds image cards
+    const[cards, setCards] = useState([])
+
+    //creates image cards
+    useEffect(() => {
+      let newImageCards = images.map((img) => <Image_Card 
+          key = {img[0]} 
+          selected = {img[1]} 
+          img = {img[0]} 
+          image_name = {img[2]} 
+          isTrue= {isTrue}
+          updateFileName = {updateFileName}/>)
+          setCards(newImageCards)
+    }, [images])
 
     //handles error messages
     const[err, setErr] = useState(false)
@@ -43,6 +59,25 @@ function Scraper({user, updateUser}){
     function handleUrl(e){
       let newUrl = e.target.value
       setUrl(newUrl)
+    }
+
+    //control file rename
+    const[fileName, setFileName] = useState("")
+    function handleFileName(e) {
+      let newFileName = e.target.value
+      setFileName(newFileName)
+    }
+
+    //mass rename files
+    function fileRename() {
+      let fileNumber = 0
+      let renamedImages = images.map((image) => {
+        fileNumber ++
+        image[2] = `${fileName} ${fileNumber}`
+        return image
+      })
+      setCards([])
+      setImages(renamedImages)
     }
 
     //handles public vs. logged in scrapes
@@ -205,7 +240,7 @@ function Scraper({user, updateUser}){
         })
       //converts ever file in the zip to a blob and creates a url eleement
       .then(data => {
-        let new_image_cards = []
+        let new_images = []
         let image_count = 0
         for (let img in data.files) {
           let bits = data.files[img]._data.compressedContent
@@ -214,9 +249,9 @@ function Scraper({user, updateUser}){
           //to embed the images the source of the new image is the url for the image
           image_count ++
           let new_image = [url, true, `File ${image_count}`, blob]
-          new_image_cards.push(new_image)
+          new_images.push(new_image)
         }
-        setImages(new_image_cards)
+        setImages(new_images)
         setIsLoading(false)
       })
       //catches server error
@@ -226,6 +261,7 @@ function Scraper({user, updateUser}){
       })
     }
 
+    //rename individual files
     function updateFileName(url, fileName){
       let new_images =  images.map((img) => {
         if (url == img[0]){
@@ -235,15 +271,6 @@ function Scraper({user, updateUser}){
       })
       setImages(new_images)
     }
-    
-
-    let image_cards = images.map((img) => <Image_Card 
-          key = {img[0]} 
-          selected = {img[1]} 
-          img = {img[0]} 
-          image_name = {img[2]} 
-          isTrue= {isTrue}
-          updateFileName = {updateFileName}/>)
 
     //function that allows download of images
     async function downloadImages() {
@@ -274,8 +301,13 @@ function Scraper({user, updateUser}){
             </form>}
             {err? <h3 className = "text-black text-3xl">{err.error}</h3> 
             : null}
+            {images.length == 0? null : 
+            <div className = "flex m-5">
+              <input className = "text-black border-black border-solid border-2 rounded-md pl-1.5" type="text" id="urlname" name="file_name" placeholder="Image File" onChange={handleFileName} value={fileName}/>
+              <button className = "text-2xl scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 ml-3" onClick={fileRename} >Rename Files</button>
+            </div>}
             <div className = "flex flex-wrap justify-center">
-                {preview[0]? <Preview img = {preview[1]} handleAccept = {handleAccept} handleReject = {handleReject}/> :image_cards}
+                {preview[0]? <Preview img = {preview[1]} handleAccept = {handleAccept} handleReject = {handleReject}/> :cards}
             </div>
             {images.length == 0? null : <button className = "text-2xl scrape_submit border-black border-solid border-2 rounded-md pl-1 pr-1 m-3" onClick={downloadImages}>Download</button>}
         </div>
