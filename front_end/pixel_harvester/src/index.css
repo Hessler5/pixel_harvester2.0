@@ -34,3 +34,12 @@
     background-color: rgb(0,19,42,255);
 }
 
+.about_background {
+    height: 100vh;
+}
+
+@media (max-width: 400px) {
+    .about_background {
+        height: 100%;
+    }
+}

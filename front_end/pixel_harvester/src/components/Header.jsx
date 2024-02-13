@@ -34,12 +34,12 @@ function Header({user}) {
             {user[0]? 
             <div>
                 <h1 className = "text-6xl m-3 mt-6">User Name: {user[0].username}</h1>
-                <h3 className = "text-3xl m-3">Remaining Scrapes: {3 - todays_scrapes.length}</h3>
+                <h3 className = "text-3xl m-3">Today's Remaining Scrapes: {3 - todays_scrapes.length}</h3>
                 <h3 className = "text-3xl m-3">Last Scrape: {user[1][1]? user[1][todays_scrapes.length-1].url: null}</h3>
             </div> : null}
             <div className = 'flex items-end mr-2'>
-                {location.pathname == '/about'? <button className = 'm-3'><Link to="/user">HOME</Link></button>: <button className = 'm-3'><Link to="/about">ABOUT</Link></button>}
-                {user[0]? <button className = 'm-3' onClick={handleLogout}>LOG OUT</button> : null}
+                {location.pathname == '/about'? <button className = 'm-3 scrape_submit ml-2 p-1.5 rounded-md'><Link to="/user">HOME</Link></button>: <button className = 'm-3 scrape_submit ml-2 p-1.5 rounded-md'><Link to="/about">ABOUT</Link></button>}
+                {user[0]? <button className = 'm-3 scrape_submit ml-2 p-1.5 rounded-md' onClick={handleLogout}>LOG OUT</button> : null}
             </div>
         </div>
     )
