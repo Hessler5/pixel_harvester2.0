@@ -16,12 +16,24 @@ db = SQLAlchemy(metadata=metadata)
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String, nullable = False)
+    username = db.Column(db.String, nullable = False, unique=True)
     password_hash = db.Column(db.String, nullable = False)
 
     scrapes = db.relationship('Scrape', back_populates = 'user', cascade = 'all, delete-orphan')
 
     serialize_rules = ['-scrapes.user', '-password_hash']
+
+    @validates('username')
+    def validate_email(self, key, username):
+        if len(username) < 8:
+            raise ValueError("Invalid Username")
+        return username
+    
+    @validates('password')
+    def validate_email(self, key, password):
+        if len(password) < 8:
+            raise ValueError("Invalid Password")
+        return password
 
     def __repr__(self):
         return f'<User {self.id}>'

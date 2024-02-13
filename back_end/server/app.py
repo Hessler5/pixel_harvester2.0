@@ -51,6 +51,9 @@ def check_logged_in_user():
 def create_new_account():
     try:
         data = request.json
+        if len(data.get("password")) < 8 or len(data.get("username")) < 8:
+            return {"Error": "Invalid Username or Password"}, 404
+
         password_hash = bcrypt.generate_password_hash(data.get("password"))
         new_user = User(username = data.get("username"), password_hash = password_hash)
         db.session.add(new_user)
@@ -72,7 +75,7 @@ def login_user():
             session['user_id'] = user.id
             return user.to_dict(), 201
         else:
-            return {"Error": "user not found"}, 404
+            return {"Error": "Invalid Username or Password"}, 404
     
     except Exception as e:
         print(e)
