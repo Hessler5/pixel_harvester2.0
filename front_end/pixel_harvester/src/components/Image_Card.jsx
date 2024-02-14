@@ -10,33 +10,25 @@ function Image_Card({img, image_name, selected, isTrue, updateFileName}){
     }
 
     //handle selection of Images
-    const[cardCSS, setCardCSS] = useState("product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md")
-    const [imageCSS, setImageCSS] = useState("w-72 h-72 mt-2.5 mb-5 shadow-md")
+    const[hover, isHover] = useState(!selected)
+    const cardCSS = "product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md"
+    const selectedCardCSS = "product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md"
+    const imageCSS = "w-72 h-72 mt-2.5 mb-5 shadow-md border-black border-solid border-2 rounded-md"
+    const selectedImageCSS = "w-72 h-72 mt-2.5 mb-5 shadow-md border-rose-500 border-solid border-2 rounded-md"
+
     function handleOnEnter() {
-        if (selected) {
-            setImageCSS("w-72 h-72 mt-2.5 mb-5 shadow-md border-rose-500 border-solid border-2 rounded-md")
-            setCardCSS("product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md")
-        } else {
-            setImageCSS("w-72 h-72 mt-2.5 mb-5 shadow-md rounded-md")
-            setCardCSS("product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md")
-        }
+        isHover(!hover)
     }
 
     function handleOnExit(){
-        if (selected) {
-            setImageCSS("w-72 h-72 mt-2.5 mb-5 shadow-md rounded-md")
-            setCardCSS("product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md")
-        } else {
-            setImageCSS("w-72 h-72 mt-2.5 mb-5 shadow-md border-rose-500 border-solid border-2 rounded-md")
-            setCardCSS("product_card border-black border-solid border-2 w-80 rounded-lg justify-center flex m-1.5 flex-wrap shadow-md")
-        }
+        isHover(!hover)
     }
 
 
     return (
-        <div className = {cardCSS}>
+        <div className = {hover || selected? selectedCardCSS: cardCSS}>
             <div className='relative'>
-                <img className = {imageCSS} src = {img} onMouseEnter = {handleOnEnter} onMouseLeave = {handleOnExit} onClick={() => isTrue(img)}/>
+                <img className = {hover || !selected? selectedImageCSS: imageCSS} src = {img} onMouseEnter = {handleOnEnter} onMouseLeave = {handleOnExit} onClick={() => isTrue(img)}/>
                 {selected? null : <p className = "absolute top-3 left-1.5">❌</p>}
             </div>
             <div className = "mb-5">
