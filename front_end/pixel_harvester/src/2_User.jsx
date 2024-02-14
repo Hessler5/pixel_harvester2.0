@@ -32,7 +32,7 @@ function User(){
     return(
         <>
             <Header user = {user}/>
-            <h1 className="text-6xl font-bold underline text-center my-2 text-black">Harvester</h1>
+            <h1 className="text-6xl font-bold underline text-center my-2 text-black">Harveste Images</h1>
             <Scraper user = {user} updateUser = {updateUser}/>
         </>
     )

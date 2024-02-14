@@ -9,7 +9,7 @@ function Home(){
         <>
             <Login/>
             <div className = "flex justify-center m-3">
-                <h1 className = "text-black text-6xl">Try Harvesting Now before Loging in!</h1>
+                <h1 className = "text-black text-6xl">Try Harvesting Images Now before Loging in!</h1>
             </div>
             <Scraper/>
         </>

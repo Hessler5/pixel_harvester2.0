@@ -23,7 +23,7 @@ function About(){
                 <div className = "flex flex-wrap justify-center">
                     <div className = "w-4/5 text-center bg-white border-black border-solid border-2 rounded-lg m-5">
                         <h1 className="text-black underline text-xl">About this Project</h1>
-                        <p className="text-black mx-5 mb-3">This scraper was created as a graduation project for the Flatiron School programming bootcamp. As opposed to traditional scrappers that loop through the html tree of websites this project uses image processing to to remove images from a screenshot taken of the entire webpages. The intended use of a scraper like this is to aid in the image/data capture for projects such as training a machine learning model.</p>
+                        <p className="text-black mx-5 mb-3">Pixel Harvester is a web scraper that will scrape images from an inputted website. This scraper was created as a graduation project for the Flatiron School programming bootcamp. As opposed to traditional scrappers that loop through the html tree of websites this project uses image processing to to remove images from a screenshot taken of the entire webpages. The intended use of a scraper like this is to aid in the image/data capture for projects such as training a machine learning model.</p>
                     </div>
                     <div className = "w-4/5 text-center bg-white border-black border-solid border-2 rounded-lg m-5">
                         <h1 className="text-black underline text-xl">Scraping Ethics</h1>
